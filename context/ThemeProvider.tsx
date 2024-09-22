@@ -10,21 +10,38 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState("");
+  // Initialize mode based on system preference or fallback to light mode
+  const [mode, setMode] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const storedTheme = localStorage.getItem("theme");
+      if (storedTheme) {
+        return storedTheme;
+      } else {
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        return prefersDark ? "dark" : "light";
+      }
+    }
+    return "light"; // Default mode if we can't determine the preference
+  });
 
-  const handleThemeChange = () => {
-    if (mode === "dark") {
-      setMode("light");
-      document.documentElement.classList.add("light");
+  // Effect to apply the theme and persist it to localStorage
+  useEffect(() => {
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     } else {
-      setMode("dark");
+      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
     }
-  };
-
-  useEffect(() => {
-    handleThemeChange();
+    localStorage.setItem("theme", mode); // Save mode to localStorage
   }, [mode]);
+
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>
       {children}
