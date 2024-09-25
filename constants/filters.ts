@@ -1,4 +1,4 @@
-import { IFilterOptions } from "@/types";
+import { IFilterOptions } from "../types";
 
 export const AnswerFilters: IFilterOptions[] = [
   { name: "Highest Upvotes", value: "highestUpvotes" },

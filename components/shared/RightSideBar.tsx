@@ -6,26 +6,26 @@ import RenderTag from "./RenderTag";
 
 const RightSidebar = async () => {
   const hotQuestions = [
-    { _id: 1, title: "How do I use express as a custom server in NextJS" },
+    { _id: "1", title: "How do I use express as a custom server in NextJS" },
     {
-      _id: 2,
+      _id: "2",
       title:
         "Node.js res.json() and res.send(), not working but still able to change status code",
     },
     {
-      _id: 3,
+      _id: "3",
       title:
         "What are the benefits and trade-offs of using Server-Side Rendering (SSR) in Next.js?",
     },
-    { _id: 4, title: "How to center a div?" },
-    { _id: 5, title: "ReactJs or NextJs for beginners, I ask for advice" },
+    { _id: "4", title: "How to center a div?" },
+    { _id: "5", title: "ReactJs or NextJs for beginners, I ask for advice" },
   ];
   const popularTags = [
-    { _id: 1, name: "javascript", numberOfQuestions: 100 },
-    { _id: 2, name: "html", numberOfQuestions: 80 },
-    { _id: 3, name: "react", numberOfQuestions: 70 },
-    { _id: 4, name: "next", numberOfQuestions: 50 },
-    { _id: 5, name: "vue", numberOfQuestions: 20 },
+    { _id: "1", name: "javascript", numberOfQuestions: 100 },
+    { _id: "2", name: "html", numberOfQuestions: 80 },
+    { _id: "3", name: "react", numberOfQuestions: 70 },
+    { _id: "4", name: "next", numberOfQuestions: 50 },
+    { _id: "5", name: "vue", numberOfQuestions: 20 },
   ];
 
   return (
