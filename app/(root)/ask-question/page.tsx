@@ -1,3 +1,4 @@
+import Question from "@/components/forms/Question";
 import React from "react";
 
 const page = () => {
@@ -5,7 +6,11 @@ const page = () => {
 
   if (!isUserLoggedIn) {
   }
-  return <div>Ask Question</div>;
+  return (
+    <div>
+      <Question />
+    </div>
+  );
 };
 
 export default page;
