@@ -50,15 +50,58 @@ const Question = () => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
-                  placeholder="shadcn"
+                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
+              <FormDescription className="body-regular mt-2.5 text-light-500">
+                Be specific and imagine you&apos;re asking a question to another
+                person.
               </FormDescription>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="explanation"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Detailed explanation of your problem?{" "}
+                <span className="text-primary-500">*</span>
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                {/* TODO: Add an Editor Component */}
+              </FormControl>
+              <FormDescription className="body-regular mt-2.5 text-light-500">
+                Introduce the problem and expand on what you put in the title.
+                Minimum 20 characters.
+              </FormDescription>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="explanation"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Tags <span className="text-primary-500">*</span>
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                <Input
+                  className="no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  placeholder="Add tags..."
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription className="body-regular mt-2.5 text-light-500">
+                Add up to 3 tags to describe what your question is about. Start
+                typing to see suggestions.
+              </FormDescription>
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
