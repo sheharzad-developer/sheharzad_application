@@ -18,17 +18,16 @@ import { Button } from "../ui/button";
 import { QuestionSchema } from "@/lib/validations";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
+import { createQuestion } from "@/lib/actions/question.action";
 
-const type: any = "editor";
+import type { Editor as TinyMCEEditor } from "tinymce";
+const type: any = "create";
 
 const Question = () => {
-  const editorRef = useRef(null);
+  const editorRef = useRef<TinyMCEEditor | null>(null);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
-  };
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionSchema>>({
     resolver: zodResolver(QuestionSchema),
@@ -40,10 +39,11 @@ const Question = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof QuestionSchema>) {
+  async function onSubmit(values: z.infer<typeof QuestionSchema>) {
     setIsSubmitting(true);
 
     try {
+      await createQuestion({});
     } catch (error) {
     } finally {
       setIsSubmitting(false);
@@ -122,7 +122,11 @@ const Question = () => {
               <FormControl className="mt-3.5">
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
-                  onInit={(_evt, editor) => (editorRef.current = editor)}
+                  onInit={(evt, editor) => {
+                    editorRef.current = editor;
+                  }}
+                  onBlur={field.onBlur}
+                  onEditorChange={(content) => field.onChange(content)}
                   initialValue=""
                   init={{
                     height: 500,
