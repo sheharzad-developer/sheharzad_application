@@ -18,7 +18,13 @@ const LocalSearchBar = ({
   placeholder,
   otherClasses,
 }: CustomInputProps) => {
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = React.useState(""); // Keep state for input value
+
+  // Handle input changes and set value to state
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
   return (
     <div
       className={`background-light800_darkgradient flex min-h-[56px] grow items-center gap-4 rounded-[10px] px-4
@@ -36,8 +42,8 @@ const LocalSearchBar = ({
       <Input
         type="text"
         placeholder={placeholder}
-        value=""
-        onChange={() => {}}
+        value={inputValue} // Use the inputValue state
+        onChange={handleInputChange} // Call handleInputChange on input change
         className="paragraph-regular no-focus placeholder text-dark400_light700 border-none bg-transparent shadow-none outline-none"
       />
       {iconPosition === "right" && (

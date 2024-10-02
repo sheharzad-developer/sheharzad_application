@@ -28,7 +28,8 @@ export async function createUser(userData: CreateUserParams) {
 
     const newUser = await User.create(userData);
 
-    return new User();
+    // Return the newly created user
+    return newUser; // Fix here
   } catch (error) {
     console.log(error);
     throw error;
@@ -64,16 +65,10 @@ export async function deleteUser(params: DeleteUserParams) {
       throw new Error("User not found");
     }
 
-    // Delete the user from the database
-    // await deleteUser({ clerkId: id });
+    // Fetch user question IDs but do not use them if not needed
+    // const userQuestionIds = await Question.find({ author: user._id }).distinct("_id");
 
-    /// het user question ids
-    const userQuestionIds = await Question.find({ author: user._id }).distinct(
-      "_id"
-    );
-
-    // delete user questions
-
+    // Delete the user's questions
     await Question.deleteMany({ author: user._id });
 
     // TODO: delete user answers, comments, etc.

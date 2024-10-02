@@ -1,5 +1,9 @@
 import { BADGE_CRITERIA } from "@/constants";
 
+export interface IFilterOptions {
+  name: string;
+  value: string;
+}
 export interface SidebarLink {
   imgURL: string;
   route: string;
