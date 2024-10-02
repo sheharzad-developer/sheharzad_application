@@ -22,7 +22,7 @@ const NoResult = ({ title, description, link, linkTitle }: Props) => {
       />
 
       <Image
-        src="/assets/images/dark-illstration.png"
+        src="/assets/images/dark-illustration.png"
         alt="No result found"
         width={270}
         height={200}

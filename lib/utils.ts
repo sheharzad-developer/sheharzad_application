@@ -5,9 +5,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getTimestamp = (createdAt: Date): string => {
+export const getTimestamp = (createdAt: Date | string): string => {
+  // Convert createdAt to Date if it's a string
+  const date = typeof createdAt === "string" ? new Date(createdAt) : createdAt;
+
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    throw new Error("Invalid date provided");
+  }
+
   const now = new Date();
-  const timeDifference = now.getTime() - createdAt.getTime();
+  const timeDifference = now.getTime() - date.getTime();
 
   // Define time intervals in milliseconds
   const minute = 60 * 1000;
@@ -42,6 +49,12 @@ export const getTimestamp = (createdAt: Date): string => {
 };
 
 export const formatAndDivideNumber = (num: number): string => {
+  // Check if num is a number and is not NaN
+  if (typeof num !== "number" || isNaN(num)) {
+    console.error("Invalid input: expected a number", num);
+    return "0"; // or any default value you want to return
+  }
+
   if (num >= 1000000) {
     const formattedNum = (num / 1000000).toFixed(1);
     return `${formattedNum}M`;

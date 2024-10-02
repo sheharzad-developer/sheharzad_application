@@ -5,25 +5,25 @@ import RenderTag from "../shared/RenderTag";
 import Metric from "../shared/Metric";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 
-// interface Answer {
-//   text: string;
-// }
+interface Tag {
+  _id: string;
+  name: string;
+}
+
+interface Author {
+  _id: string;
+  name: string;
+  picture: string;
+}
 
 interface QuestionProps {
   _id: string;
   title: string;
-  tags: {
-    _id: string;
-    name: string;
-  }[];
-  author: {
-    _id: string;
-    name: string;
-    picture: string;
-  };
+  tags: Tag[];
+  author: Author;
   upvotes: number;
   views: number;
-  answers: Array<object>;
+  answers: Array<any>; // Changed from object to any for flexibility
   createdAt: Date;
 }
 
@@ -34,11 +34,12 @@ const QuestionCard = ({
   author,
   upvotes,
   views,
-  answers,
+  answers = [], // Default to an empty array if answers is undefined
   createdAt,
 }: QuestionProps) => {
+  console.log("TAGS", tags);
   return (
-    <div className="card-wrapper p-9 sm:px-11 rounded-[10px] p-9 sm:px-11">
+    <div className="card-wrapper p-9 sm:px-11 rounded-[10px]">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
         <div>
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
@@ -76,9 +77,9 @@ const QuestionCard = ({
         />
         <Metric
           imgUrl="/assets/icons/message.svg"
-          alt="message"
-          value={formatAndDivideNumber(answers.length)}
-          title="Votes"
+          alt="Answers"
+          value={formatAndDivideNumber(answers.length)} // Safe access to length
+          title="Answers"
           textStyles="small-medium text-dark400_light800"
         />
         <Metric
