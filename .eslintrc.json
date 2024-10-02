@@ -4,5 +4,10 @@
     "standard",
     "plugin:tailwindcss/recommended",
     "prettier"
-  ]
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off", // Disable the 'React not defined' rule for JSX
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^React$" }], // Prevent warning for 'React' if not used
+    "no-unused-vars": ["warn"]
+  }
 }
