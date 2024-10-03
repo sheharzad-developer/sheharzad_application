@@ -1,8 +1,15 @@
 {
+  "plugins": ["tailwindcss"],
   "extends": [
     "next/core-web-vitals",
     "standard",
     "plugin:tailwindcss/recommended",
     "prettier"
-  ]
+  ],
+  "rules": {
+    "no-unused-vars": [
+      "warn", // Change this to "warn" if you want warnings instead of errors
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }
+    ]
+  }
 }
