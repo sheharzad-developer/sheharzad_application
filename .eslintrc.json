@@ -8,7 +8,7 @@
   ],
   "rules": {
     "no-unused-vars": [
-      "warn", // Change this to "warn" if you want warnings instead of errors
+      "warn",
       { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }
     ]
   }
