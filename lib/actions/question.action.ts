@@ -1,73 +1,13 @@
-// "use server";
-
-// import Question from "@/database/question.model";
-// import Tag from "@/database/tag.model";
-// import { connectToDatabase } from "./mongoose";
-// import { CreateQuestionParams, GetQuestionsParams } from "./shared.types";
-// import User from "@/database/user.model";
-// import { revalidatePath } from "next/cache";
-
-// export async function getQuestions(params: GetQuestionsParams) {
-//   try {
-//     connectToDatabase();
-
-//     const questions = await Question.find({})
-//       .populate({ path: "tags", model: Tag })
-//       .populate({ path: "author", model: User })
-//       .sort({ createdAt: -1 });
-
-//     return { questions };
-//   } catch (error) {
-//     console.log(error);
-//     throw error;
-//   }
-// }
-
-// export async function createQuestion(params: CreateQuestionParams) {
-//   try {
-//     connectToDatabase();
-
-//     const { title, content, tags, author, path } = params;
-
-//     // Create the question
-//     const question = await Question.create({
-//       title,
-//       content,
-//       tags,
-//       author, // author should be a string (e.g., MongoDB ObjectId as string)
-//       path,
-//     });
-
-//     const tagDocuments = [];
-
-//     // Create the tags or get them if they already exist
-//     for (const tag of tags) {
-//       const existingTag = await Tag.findOneAndUpdate(
-//         { name: { $regex: new RegExp(`^${tag}$`, "i") } },
-//         { $setOnInsert: { name: tag }, $push: { question: question._id } },
-//         { upsert: true, new: true }
-//       );
-
-//       tagDocuments.push(existingTag._id);
-//     }
-
-//     await Question.findByIdAndUpdate(question._id, {
-//       $push: { tags: { $each: tagDocuments } },
-//     });
-
-//     // Create an interaction record for the user's ask_question action
-
-//     // Increment author's reputation by +5 for creating a question
-
-//     revalidatePath(path);
-//   } catch (error) {}
-// }
 "use server";
 
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
 import { connectToDatabase } from "./mongoose";
-import { GetQuestionsParams, CreateQuestionParams } from "./shared.types";
+import {
+  GetQuestionsParams,
+  CreateQuestionParams,
+  EditQuestionParams,
+} from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 
@@ -77,8 +17,15 @@ export async function getQuestions(params: GetQuestionsParams) {
 
   try {
     const questions = await Question.find({})
-      .populate({ path: "tags", model: Tag })
-      .populate({ path: "author", model: User })
+      .populate({
+        path: "tags",
+        model: Tag,
+      })
+      .populate({
+        path: "author",
+        model: User,
+        select: "name username", // Make sure you select the fields you want
+      })
       .sort({ createdAt: -1 });
 
     // Serialize questions to ensure only plain objects are returned
@@ -87,7 +34,11 @@ export async function getQuestions(params: GetQuestionsParams) {
       title: question.title,
       content: question.content,
       tags: question.tags.map((tag) => tag.toString()), // Ensure tags are strings
-      author: question.author.toString(), // Convert author ID to string
+      author: {
+        _id: question.author._id.toString(), // Convert author's ObjectId to string
+        name: question.author.name, // Add the author's name
+        username: question.author.username, // Add the author's username if needed
+      },
       upvotes: question.upvotes,
       views: question.views,
       answers: question.answers,
@@ -100,7 +51,6 @@ export async function getQuestions(params: GetQuestionsParams) {
     throw new Error("Could not fetch questions"); // More descriptive error
   }
 }
-
 // Function to create a question
 export async function createQuestion(params: CreateQuestionParams) {
   await connectToDatabase();
@@ -112,8 +62,9 @@ export async function createQuestion(params: CreateQuestionParams) {
     const question = await Question.create({
       title,
       content,
+      author,
       // tags,
-      author, // author should be a string (e.g., MongoDB ObjectId as string)
+      // author should be a string (e.g., MongoDB ObjectId as string)
       // path,
     });
 
@@ -148,3 +99,4 @@ export async function createQuestion(params: CreateQuestionParams) {
     throw new Error("Could not create question"); // More descriptive error
   }
 }
+export async function editQuestion(params: EditQuestionParams) {}

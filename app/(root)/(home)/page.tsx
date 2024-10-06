@@ -9,7 +9,7 @@ import QuestionCard from "@/components/cards/QuestionCard";
 import { getQuestions } from "@/lib/actions/question.action";
 
 export default async function Home() {
-  const result = await getQuestions({});
+  const { questions } = await getQuestions({});
 
   // const [result, setResult] = useState({ questions: [] });
 
@@ -55,8 +55,8 @@ export default async function Home() {
       <HomeFilters />
 
       <div className="mt-10 flex w-full flex-col gap-6">
-        {result.questions.length > 0 ? (
-          result.questions.map((question) => (
+        {questions.length > 0 ? (
+          questions.map((question) => (
             <QuestionCard
               key={question._id}
               _id={question._id}
