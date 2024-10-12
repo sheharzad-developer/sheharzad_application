@@ -2,35 +2,42 @@
 
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
-import { connectToDatabase } from "../mongoose";
+import { connectToDatabase } from "./mongoose";
 import {
   GetQuestionsParams,
   CreateQuestionParams,
-  EditQuestionParams,
   GetQuestionByIdParams,
 } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 
 // Function to fetch questions
-export async function getQuestionById(params: GetQuestionByIdParams) {
+export async function getQuestions(params: GetQuestionsParams) {
+  await connectToDatabase();
+
   try {
-    connectToDatabase();
+    const questions = await Question.find({})
+      .populate({ path: "tags", model: Tag })
+      .populate({ path: "author", model: User })
+      .sort({ createdAt: -1 });
 
-    const { questionId } = params;
+    // Serialize questions to ensure only plain objects are returned
+    const serializedQuestions = questions.map((question) => ({
+      _id: question._id.toString(), // Convert ObjectId to string
+      title: question.title,
+      content: question.content,
+      tags: question.tags.map((tag) => tag.toString()), // Ensure tags are strings
+      author: question.author.toString(), // Convert author ID to string
+      upvotes: question.upvotes,
+      views: question.views,
+      answers: question.answers,
+      createdAt: question.createdAt.toISOString(), // Ensure createdAt is serialized
+    }));
 
-    const question = await Question.findById(questionId)
-      .populate({ path: "tags", model: Tag, select: "_id name" })
-      .populate({
-        path: "author",
-        model: User,
-        select: "_id clerkId name picture",
-      });
-
-    return question;
+    return { questions: serializedQuestions };
   } catch (error) {
-    console.log(error);
-    throw error;
+    console.error("Error fetching questions:", error);
+    throw new Error("Could not fetch questions"); // More descriptive error
   }
 }
 
@@ -45,9 +52,8 @@ export async function createQuestion(params: CreateQuestionParams) {
     const question = await Question.create({
       title,
       content,
-      author,
       // tags,
-      // author should be a string (e.g., MongoDB ObjectId as string)
+      author, // author should be a string (e.g., MongoDB ObjectId as string)
       // path,
     });
 
@@ -83,4 +89,23 @@ export async function createQuestion(params: CreateQuestionParams) {
   }
 }
 
-export async function editQuestion(params: EditQuestionParams) {}
+export async function getQuestionById(params: GetQuestionByIdParams) {
+  try {
+    connectToDatabase();
+
+    const { questionId } = params;
+
+    const question = await Question.findById(questionId)
+      .populate({ path: "tags", model: Tag, select: "_id name" })
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id clerkId name picture",
+      });
+
+    return question;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
