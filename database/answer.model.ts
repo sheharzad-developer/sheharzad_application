@@ -1,7 +1,6 @@
 import { Schema, models, model, Document } from "mongoose";
-import { AnswerSchema } from "@/lib/validations";
 
-export interface AnswerSchema extends Document {
+export interface IAnswer extends Document {
   author: Schema.Types.ObjectId;
   question: Schema.Types.ObjectId;
   content: string;

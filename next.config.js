@@ -1,3 +1,5 @@
+import { getNameOfDeclaration } from "typescript";
+
 const nextConfig = {
   experimental: {
     mdxRs: true, // Enable MDX remote support
