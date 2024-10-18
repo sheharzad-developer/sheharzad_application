@@ -1,13 +1,5 @@
-import dynamic from "next/dynamic";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
-import { useTheme } from "@/context/ThemeProvider";
-import { Button } from "../ui/button";
-import Image from "next/image";
-import { createAnswer } from "@/lib/actions/answer.action";
-import { usePathname } from "next/navigation";
+"use client";
+
 import {
   Form,
   FormControl,
@@ -15,13 +7,17 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
+import { useForm } from "react-hook-form";
 import { AnswerSchema } from "@/lib/validations";
-
-// Dynamically import TinyMCE editor for client-side only
-const Editor = dynamic(
-  () => import("@tinymce/tinymce-react").then((mod) => mod.Editor),
-  { ssr: false }
-);
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Editor } from "@tinymce/tinymce-react";
+import { useRef, useState } from "react";
+import { useTheme } from "@/context/ThemeProvider";
+import { Button } from "../ui/button";
+import Image from "next/image";
+import { createAnswer } from "@/lib/actions/answer.action";
+import { usePathname } from "next/navigation";
 
 interface Props {
   question: string;
@@ -102,6 +98,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
                   <Editor
                     apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                     onInit={(evt, editor) => {
+                      // @ts-ignore
                       editorRef.current = editor;
                     }}
                     onBlur={field.onBlur}
@@ -110,12 +107,26 @@ const Answer = ({ question, questionId, authorId }: Props) => {
                       height: 350,
                       menubar: false,
                       plugins: [
-                        "advlist autolink lists link image charmap preview anchor",
-                        "searchreplace visualblocks codesample fullscreen",
-                        "insertdatetime media table paste",
+                        "advlist",
+                        "autolink",
+                        "lists",
+                        "link",
+                        "image",
+                        "charmap",
+                        "preview",
+                        "anchor",
+                        "searchreplace",
+                        "visualblocks",
+                        "codesample",
+                        "fullscreen",
+                        "insertdatetime",
+                        "media",
+                        "table",
                       ],
                       toolbar:
-                        "undo redo | codesample | bold italic forecolor | alignleft aligncenter | alignright alignjustify | bullist numlist",
+                        "undo redo | " +
+                        "codesample | bold italic forecolor | alignleft aligncenter |" +
+                        "alignright alignjustify | bullist numlist",
                       content_style:
                         "body { font-family:Inter; font-size:16px }",
                       skin: mode === "dark" ? "oxide-dark" : "oxide",
