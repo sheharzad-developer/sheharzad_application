@@ -1,4 +1,4 @@
-"use client";
+"use server"
 
 import Answer from "@/database/answer.model";
 import { connectToDatabase } from "../mongoose";
@@ -12,30 +12,36 @@ export async function createAnswer(params: CreateAnswerParams) {
 
     const { content, author, question, path } = params;
 
-    const newAnswer = new Answer({ content, author, question });
-
+    const newAnswer = await Answer.create({ content, author, question });
+    
+    // Add the answer to the question's answers array
     await Question.findByIdAndUpdate(question, {
-      $push: { answers: newAnswer._id },
-    });
+      $push: { answers: newAnswer._id}
+    })
 
-    revalidatePath(path);
+    // TODO: Add interaction...
+
+    revalidatePath(path)
   } catch (error) {
-    console.error("Error creating answer", error);
+    console.log(error);
+    throw error;
   }
 }
 
-export default async function getAnswers(params) {
-  await connectToDatabase(); // Ensures connection is active, without redundancy
-
+export async function getAnswers(params: GetAnswersParams) {
   try {
+    connectToDatabase();
+
     const { questionId } = params;
+
     const answers = await Answer.find({ question: questionId })
       .populate("author", "_id clerkId name picture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
 
     return { answers };
   } catch (error) {
-    console.error("Failed to fetch answers:", error);
-    throw error; // Propagate error for handling it in the caller function
+    console.log(error);
+    throw error;
   }
 }
+

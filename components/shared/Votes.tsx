@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react'
 
 const Votes = () => {
-  return <div>Votes</div>;
-};
+  return (
+    <div>Votes</div>
+  )
+}
 
-export default Votes;
+export default Votes

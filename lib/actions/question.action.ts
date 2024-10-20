@@ -1,141 +1,81 @@
-"use server";
+"use server"
 
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
-import connectToDatabase from "./mongoose";
-import {
-  GetQuestionsParams,
-  CreateQuestionParams,
-  GetQuestionByIdParams,
-} from "./shared.types";
+import { connectToDatabase } from "../mongoose"
+import { CreateQuestionParams, GetQuestionByIdParams, GetQuestionsParams } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 
-// Function to fetch questions
-export async function getQuestions(params) {
-  await connectToDatabase();
-
+export async function getQuestions(params: GetQuestionsParams) {
   try {
+    connectToDatabase();
+
     const questions = await Question.find({})
-      .populate({ path: "tags", model: Tag })
-      .populate({ path: "author", model: User })
-      .sort({ createdAt: -1 });
+      .populate({ path: 'tags', model: Tag })
+      .populate({ path: 'author', model: User })
+      .sort({ createdAt: -1 })
 
-    // Serialize questions to ensure only plain objects are returned
-    const serializedQuestions = questions.map((question) => ({
-      _id: question._id.toString(), // Convert ObjectId to string
-      title: question.title,
-      content: question.content,
-      tags: question.tags.map((tag) => ({
-        _id: tag._id.toString(),
-        name: tag.name,
-      })), // Serialize tag IDs and names
-      author: {
-        _id: question.author._id.toString(), // Serialize author ID
-        name: question.author.name, // Serialize author name
-        picture: question.author.picture, // Include author picture if needed
-      },
-      upvotes: question.upvotes,
-      views: question.views,
-      answers: question.answers,
-      createdAt: question.createdAt.toISOString(), // Ensure createdAt is serialized
-    }));
-
-    return { questions: serializedQuestions };
+    return { questions };
   } catch (error) {
-    console.error("Error fetching questions:", error);
-    throw new Error("Could not fetch questions"); // More descriptive error
+    console.log(error)
+    throw error;
   }
 }
 
-// Function to create a question
-export async function createQuestion(params) {
-  await connectToDatabase();
-
+export async function createQuestion(params: CreateQuestionParams) {
   try {
+    connectToDatabase();
+
     const { title, content, tags, author, path } = params;
 
-    // Create a new question
+    // Create the question
     const question = await Question.create({
       title,
       content,
-      author, // author should be a string (e.g., MongoDB ObjectId as string)
+      author
     });
 
     const tagDocuments = [];
 
-    // Process tags
+    // Create the tags or get them if they already exist
     for (const tag of tags) {
-      if (typeof tag !== "string") {
-        throw new Error("Each tag should be a string");
-      }
-
       const existingTag = await Tag.findOneAndUpdate(
-        { name: { $regex: new RegExp(`^${tag}$`, "i") } },
-        { $setOnInsert: { name: tag }, $addToSet: { questions: question._id } }, // Use $addToSet to prevent duplicates
+        { name: { $regex: new RegExp(`^${tag}$`, "i") } }, 
+        { $setOnInsert: { name: tag }, $push: { question: question._id } },
         { upsert: true, new: true }
-      );
+      )
 
-      // Collect the tag IDs to update the question
       tagDocuments.push(existingTag._id);
     }
 
-    // Update the question with the tag references
     await Question.findByIdAndUpdate(question._id, {
-      $set: { tags: tagDocuments }, // Set the tags for the question
+      $push: { tags: { $each: tagDocuments }}
     });
 
-    // Revalidate the path for any cached data
-    if (path) {
-      revalidatePath(path);
-    }
+    // Create an interaction record for the user's ask_question action
+    
+    // Increment author's reputation by +5 for creating a question
+
+    revalidatePath(path)
   } catch (error) {
-    console.error("Error creating question:", error);
-    throw new Error("Could not create question"); // More descriptive error
+    
   }
 }
 
-export async function getQuestionById(params) {
-  await connectToDatabase(); // Make sure to await this
-
+export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
+    connectToDatabase();
+
     const { questionId } = params;
 
     const question = await Question.findById(questionId)
-      .populate({ path: "tags", model: Tag, select: "_id name" })
-      .populate({
-        path: "author",
-        model: User,
-        select: "_id clerkId name picture",
-      });
+      .populate({ path: 'tags', model: Tag, select: '_id name'})
+      .populate({ path: 'author', model: User, select: '_id clerkId name picture'})
 
-    if (!question) {
-      throw new Error("Question not found");
-    }
-
-    // Serialize the question to plain objects
-    const serializedQuestion = {
-      _id: question._id.toString(),
-      title: question.title,
-      content: question.content,
-      tags: question.tags.map((tag) => ({
-        _id: tag._id.toString(),
-        name: tag.name,
-      })),
-      author: {
-        _id: question.author._id.toString(),
-        name: question.author.name,
-        picture: question.author.picture,
-      },
-      createdAt: question.createdAt.toISOString(),
-      upvotes: question.upvotes,
-      views: question.views,
-      answers: question.answers,
-    };
-
-    return serializedQuestion;
+      return question;
   } catch (error) {
-    console.error("Error fetching question by ID:", error);
-    throw new Error("Could not fetch question by ID");
+    console.log(error);
+    throw error;
   }
 }

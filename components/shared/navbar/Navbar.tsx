@@ -1,7 +1,7 @@
-import Link from "next/link";
-import Image from "next/image";
-import React from "react";
 import { SignedIn, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 import Theme from "./Theme";
 import MobileNav from "./MobileNav";
 import GlobalSearch from "../search/GlobalSearch";
@@ -14,15 +14,19 @@ const Navbar = () => {
           src="/assets/images/site-logo.svg"
           width={23}
           height={23}
-          alt="Sheharzad_Application"
+          alt="DevFlow"
         />
+
         <p className="h2-bold font-spaceGrotesk text-dark-100 dark:text-light-900 max-sm:hidden">
           Sheharzad <span className="text-primary-500">Application</span>
         </p>
       </Link>
+
       <GlobalSearch />
+
       <div className="flex-between gap-5">
         <Theme />
+
         <SignedIn>
           <UserButton
             afterSignOutUrl="/"
@@ -36,6 +40,7 @@ const Navbar = () => {
             }}
           />
         </SignedIn>
+
         <MobileNav />
       </div>
     </nav>
